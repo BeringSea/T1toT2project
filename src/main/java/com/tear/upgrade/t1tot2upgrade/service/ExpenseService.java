@@ -1,12 +1,12 @@
 package com.tear.upgrade.t1tot2upgrade.service;
 
 import com.tear.upgrade.t1tot2upgrade.entity.Expense;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ExpenseService {
 
-    List<Expense> getAllExpenses();
+    Page<Expense> getAllExpenses(Pageable page);
 
     Expense getExpenseById(Long id);
 

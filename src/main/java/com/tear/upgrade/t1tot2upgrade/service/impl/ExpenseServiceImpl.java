@@ -4,9 +4,10 @@ import com.tear.upgrade.t1tot2upgrade.entity.Expense;
 import com.tear.upgrade.t1tot2upgrade.repository.ExpenseRepository;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,8 +17,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     private ExpenseRepository expenseRepository;
 
     @Override
-    public List<Expense> getAllExpenses() {
-        return expenseRepository.findAll();
+    public Page<Expense> getAllExpenses(Pageable page) {
+        return expenseRepository.findAll(page);
     }
 
     @Override
