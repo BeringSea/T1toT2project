@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Naming Ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset_2_0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset_2_0 http://pmd.sourceforge.net/ruleset_2_0.xsd">
+
+    <description>
+        Custom ruleset that excludes the ShortVariable rule from the naming ruleset.
+    </description>
+
+    <rule ref="rulesets/java/naming.xml/ClassNamingConventions" />
+    <rule ref="rulesets/java/naming.xml/MethodNamingConventions" />
+    <rule ref="rulesets/java/naming.xml/VariableNamingConventions" />
+</ruleset>

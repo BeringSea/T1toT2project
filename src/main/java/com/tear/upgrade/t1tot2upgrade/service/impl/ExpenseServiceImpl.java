@@ -3,6 +3,7 @@ package com.tear.upgrade.t1tot2upgrade.service.impl;
 import com.tear.upgrade.t1tot2upgrade.entity.Expense;
 import com.tear.upgrade.t1tot2upgrade.repository.ExpenseRepository;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
+import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         if(expense.isPresent()){
             return expense.get();
         }
-        else throw new RuntimeException("Expense is not found for id " + id);
+        throw new ResourceNotFoundException("Expense is not found for id " + id);
     }
 
     @Override
