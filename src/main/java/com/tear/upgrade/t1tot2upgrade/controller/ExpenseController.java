@@ -2,6 +2,7 @@ package com.tear.upgrade.t1tot2upgrade.controller;
 
 import com.tear.upgrade.t1tot2upgrade.entity.Expense;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class ExpenseController {
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping("/expenses")
-    public Expense saveExpenseDetails(@RequestBody Expense expense) {
+    public Expense saveExpenseDetails(@Valid @RequestBody Expense expense) {
         return expenseService.saveExpanseDetails(expense);
     }
 
