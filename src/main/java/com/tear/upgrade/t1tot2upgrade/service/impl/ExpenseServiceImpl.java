@@ -49,14 +49,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         existingExpense.setName(expense.getName() != null ? expense.getName() : existingExpense.getName());
         existingExpense.setDescription(expense.getDescription() != null ? expense.getDescription() : existingExpense.getDescription());
         existingExpense.setAmount(expense.getAmount() != null ? expense.getAmount() : existingExpense.getAmount());
-        existingExpense.setCategory(expense.getCategory() != null ? expense.getCategory() : existingExpense.getCategory());
         existingExpense.setDate(expense.getDate() != null ? expense.getDate() : existingExpense.getDate());
         return expenseRepository.save(existingExpense);
-    }
-
-    @Override
-    public List<Expense> readByCategory(String category, Pageable page) {
-        return expenseRepository.findByCategory(category, page).toList();
     }
 
     @Override

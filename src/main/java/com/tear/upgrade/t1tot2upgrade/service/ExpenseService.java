@@ -19,8 +19,6 @@ public interface ExpenseService {
 
     Expense updateExpenseDetails(Long id, Expense expense);
 
-    List<Expense> readByCategory(String category, Pageable page);
-
     List<Expense> readByName(String name, Pageable page);
 
     List<Expense> readByDate(Date startDate, Date endDate, Pageable page);

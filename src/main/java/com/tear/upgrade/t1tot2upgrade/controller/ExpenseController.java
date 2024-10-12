@@ -44,10 +44,10 @@ public class ExpenseController {
         return expenseService.updateExpenseDetails(id, expense);
     }
 
-    @GetMapping("/expenses/category")
-    public List<Expense> getExpensesByCategory(@RequestParam String category, Pageable page) {
-        return expenseService.readByCategory(category, page);
-    }
+//    @GetMapping("/expenses/category")
+//    public List<Expense> getExpensesByCategory(@RequestParam String category, Pageable page) {
+//        return expenseService.readByCategory(category, page);
+//    }
 
     @GetMapping("/expenses/name")
     public List<Expense> getAllExpensesByName(@RequestParam String keyword, Pageable page) {
