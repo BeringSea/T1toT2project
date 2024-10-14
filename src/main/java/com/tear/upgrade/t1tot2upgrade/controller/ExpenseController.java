@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -29,8 +30,9 @@ public class ExpenseController {
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/expenses")
-    public void deleteExpenseById(@RequestParam Long id) {
+    public ResponseEntity<HttpStatus> deleteExpenseById(@RequestParam Long id) {
         expenseService.deleteExpenseById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ResponseStatus(value = HttpStatus.CREATED)
