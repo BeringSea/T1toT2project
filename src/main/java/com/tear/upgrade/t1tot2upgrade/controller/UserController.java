@@ -1,9 +1,7 @@
 package com.tear.upgrade.t1tot2upgrade.controller;
 
 import com.tear.upgrade.t1tot2upgrade.entity.User;
-import com.tear.upgrade.t1tot2upgrade.entity.model.UserModel;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +12,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @PostMapping("/register")
-    public ResponseEntity<User> save(@Valid @RequestBody UserModel userModel) {
-        return new ResponseEntity<>(userService.createUser(userModel), HttpStatus.CREATED);
-    }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<User> readUser(@PathVariable Long id) {

@@ -22,7 +22,7 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorObject> handleExpenseNotFoundException(ResourceNotFoundException ex) {
+    public ResponseEntity<ErrorObject> handleResourceNotFoundException(ResourceNotFoundException ex) {
         ErrorObject errorObject = new ErrorObject();
 
         errorObject.setStatusCode(HttpStatus.NOT_FOUND.value());

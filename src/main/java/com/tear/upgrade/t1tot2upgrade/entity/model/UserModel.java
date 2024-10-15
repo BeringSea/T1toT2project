@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 public class UserModel {
 
@@ -19,4 +22,7 @@ public class UserModel {
     @NotNull(message = "Password should not be empty")
     @Size(min = 5, message = "Password should be at least 5 characters long")
     private String password;
+
+    @NotNull(message = "Roles should not be empty")
+    private Set<String> roleNames = new HashSet<>();
 }
