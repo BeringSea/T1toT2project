@@ -10,6 +10,7 @@ import com.tear.upgrade.t1tot2upgrade.repository.UserRepository;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private PasswordEncoder bcryptEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -34,6 +38,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
         BeanUtils.copyProperties(userModel, user, "roleNames");
+        user.setPassword(bcryptEncoder.encode(user.getPassword()));
 
         Set<Role> roles = getRolesFromNames(userModel.getRoleNames());
         user.setRoles(roles);
@@ -53,7 +58,7 @@ public class UserServiceImpl implements UserService {
         User currentUser = readUser(userId);
         currentUser.setUsername(user.getUsername() != null ? user.getUsername() : currentUser.getUsername());
         currentUser.setEmail(user.getEmail() != null ? user.getEmail() : currentUser.getEmail());
-        currentUser.setPassword(user.getPassword() != null ? user.getPassword() : currentUser.getPassword());
+        currentUser.setPassword(user.getPassword() != null ? bcryptEncoder.encode(user.getPassword()) : currentUser.getPassword());
         if (user.getRoles() != null) {
             Set<Role> roles = getRolesFromNames(user.getRoles().stream()
                     .map(Role::getRoleName)
