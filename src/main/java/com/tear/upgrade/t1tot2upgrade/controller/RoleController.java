@@ -6,9 +6,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class RoleController {
@@ -17,7 +17,22 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/roles")
-    private ResponseEntity<Role> save(@Valid @RequestBody Role role){
-        return new ResponseEntity<>(roleService.createRole(role), HttpStatus.OK);
+    private ResponseEntity<Role> createRole(@Valid @RequestBody Role role) {
+        return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/roles")
+    private List<Role> getAllRoles(){
+        return roleService.readAllRoles();
+    }
+
+    @GetMapping("roles/{id}")
+    private ResponseEntity<Role> readRole(@PathVariable Long id) {
+        return new ResponseEntity<>(roleService.readRole(id), HttpStatus.OK);
+    }
+
+    @PutMapping("/roles/{id}")
+    public ResponseEntity<Role> updateRole(@PathVariable Long id, @RequestBody Role role) {
+        return new ResponseEntity<>(roleService.updateRole(id, role), HttpStatus.OK);
     }
 }
