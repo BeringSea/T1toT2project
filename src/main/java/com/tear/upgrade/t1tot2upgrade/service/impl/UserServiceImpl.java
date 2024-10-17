@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,10 +35,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         BeanUtils.copyProperties(userModel, user, "roleNames");
 
-        Set<Role> roles = userModel.getRoleNames().stream()
-                .map(roleName -> roleRepository.findByRoleName(roleName)
-                        .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " not found")))
-                .collect(Collectors.toSet());
+        Set<Role> roles = getRolesFromNames(userModel.getRoleNames());
         user.setRoles(roles);
         roles.forEach(role -> role.getUsers().add(user));
 
@@ -56,6 +54,14 @@ public class UserServiceImpl implements UserService {
         currentUser.setUsername(user.getUsername() != null ? user.getUsername() : currentUser.getUsername());
         currentUser.setEmail(user.getEmail() != null ? user.getEmail() : currentUser.getEmail());
         currentUser.setPassword(user.getPassword() != null ? user.getPassword() : currentUser.getPassword());
+        if (user.getRoles() != null) {
+            Set<Role> roles = getRolesFromNames(user.getRoles().stream()
+                    .map(Role::getRoleName)
+                    .collect(Collectors.toSet()));
+
+            currentUser.getRoles().clear();
+            currentUser.getRoles().addAll(roles);
+        }
         return userRepository.save(currentUser);
     }
 
@@ -65,5 +71,12 @@ public class UserServiceImpl implements UserService {
         User currentUser = readUser(userId);
         currentUser.getRoles().clear();
         userRepository.delete(currentUser);
+    }
+
+    private Set<Role> getRolesFromNames(Collection<String> roleNames) {
+        return roleNames.stream()
+                .map(roleName -> roleRepository.findByRoleName(roleName)
+                        .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " not found")))
+                .collect(Collectors.toSet());
     }
 }
