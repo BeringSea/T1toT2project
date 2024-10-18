@@ -8,11 +8,11 @@ public interface UserService {
 
     User createUser(UserModel userModel);
 
-    User readUser(Long userId);
+    User readUser();
 
-    User updateUser(User user, Long userId);
+    User updateUser(User user);
 
-    void deleteUser(Long userId);
+    void deleteUser();
 
     User getLoggedInUser();
 }
