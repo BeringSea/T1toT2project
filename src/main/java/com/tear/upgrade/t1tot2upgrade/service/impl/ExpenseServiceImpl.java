@@ -4,6 +4,7 @@ import com.tear.upgrade.t1tot2upgrade.entity.Expense;
 import com.tear.upgrade.t1tot2upgrade.repository.ExpenseRepository;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
+import com.tear.upgrade.t1tot2upgrade.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public Page<Expense> getAllExpenses(Pageable page) {
-        return expenseRepository.findAll(page);
+        return expenseRepository.findByUserId(userService.getLoggedInUser().getId(), page);
     }
 
     @Override
@@ -40,6 +44,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense saveExpanseDetails(Expense expense) {
+        expense.setUser(userService.getLoggedInUser());
         return expenseRepository.save(expense);
     }
 
@@ -60,10 +65,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> readByDate(Date startDate, Date endDate, Pageable page) {
-        if(startDate == null){
+        if (startDate == null) {
             startDate = new Date(0);
         }
-        if(endDate == null){
+        if (endDate == null) {
             endDate = new Date(System.currentTimeMillis());
         }
         return expenseRepository.findByDateBetween(startDate, endDate, page).toList();

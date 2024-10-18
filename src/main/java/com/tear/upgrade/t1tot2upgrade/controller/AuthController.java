@@ -32,6 +32,7 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
     @PostMapping("/register")
     public ResponseEntity<User> save(@Valid @RequestBody UserModel userModel) {
         return new ResponseEntity<>(userService.createUser(userModel), HttpStatus.CREATED);

@@ -10,6 +10,9 @@ import com.tear.upgrade.t1tot2upgrade.repository.UserRepository;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +79,13 @@ public class UserServiceImpl implements UserService {
         User currentUser = readUser(userId);
         currentUser.getRoles().clear();
         userRepository.delete(currentUser);
+    }
+
+    @Override
+    public User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with not found for email: " + email));
     }
 
     private Set<Role> getRolesFromNames(Collection<String> roleNames) {

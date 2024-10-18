@@ -17,7 +17,7 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roleId;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String roleName;
@@ -34,11 +34,11 @@ public class Role {
         if (!(o instanceof Role role)) {
             return false;
         }
-        return Objects.equals(roleId, role.roleId);
+        return Objects.equals(id, role.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roleId);
+        return Objects.hash(id);
     }
 }
