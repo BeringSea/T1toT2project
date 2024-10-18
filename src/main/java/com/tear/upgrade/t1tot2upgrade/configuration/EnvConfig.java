@@ -11,14 +11,22 @@ import javax.sql.DataSource;
 public class EnvConfig {
 
     @Bean
-    public DataSource dataSource() {
-        Dotenv dotenv = Dotenv.load();
+    public Dotenv dotenv() {
+        return Dotenv.load();
+    }
 
+    @Bean
+    public DataSource dataSource(Dotenv dotenv) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(dotenv.get("DB_URL"));
         dataSource.setUsername(dotenv.get("DB_USERNAME"));
         dataSource.setPassword(dotenv.get("DB_PASSWORD"));
 
         return dataSource;
+    }
+
+    @Bean
+    public String jwtSecret(Dotenv dotenv) {
+        return dotenv.get("JWT_SECRET");
     }
 }
