@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<JwtResponseModel> login(@RequestBody AuthModel authModel) throws Exception {
         authenticate(authModel.getEmail(), authModel.getPassword());
         final UserDetails userDetails = userDetailService.loadUserByUsername(authModel.getEmail());
-        final String token = jwtToken.generateToken(userDetails.getUsername());
+        final String token = jwtToken.generateToken(userDetails);
         return new ResponseEntity<>(new JwtResponseModel(token), HttpStatus.OK);
     }
 

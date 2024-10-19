@@ -60,17 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user) {
         User currentUser = readUser();
-        currentUser.setUsername(user.getUsername() != null ? user.getUsername() : currentUser.getUsername());
-        currentUser.setEmail(user.getEmail() != null ? user.getEmail() : currentUser.getEmail());
-        currentUser.setPassword(user.getPassword() != null ? bcryptEncoder.encode(user.getPassword()) : currentUser.getPassword());
-        if (user.getRoles() != null) {
-            Set<Role> roles = getRolesFromNames(user.getRoles().stream()
-                    .map(Role::getRoleName)
-                    .collect(Collectors.toSet()));
-
-            currentUser.getRoles().clear();
-            currentUser.getRoles().addAll(roles);
-        }
+        populateUserFields(user, currentUser);
         return userRepository.save(currentUser);
     }
 
@@ -89,10 +79,31 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with not found for email: " + email));
     }
 
+    @Override
+    public User updateUserById(Long userId, User user) {
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found for the id:" + userId));
+        populateUserFields(user, currentUser);
+        return userRepository.save(currentUser);
+    }
+
     private Set<Role> getRolesFromNames(Collection<String> roleNames) {
         return roleNames.stream()
                 .map(roleName -> roleRepository.findByRoleName(roleName)
                         .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " not found")))
                 .collect(Collectors.toSet());
+    }
+
+    private void populateUserFields(User user, User currentUser) {
+        currentUser.setUsername(user.getUsername() != null ? user.getUsername() : currentUser.getUsername());
+        currentUser.setEmail(user.getEmail() != null ? user.getEmail() : currentUser.getEmail());
+        currentUser.setPassword(user.getPassword() != null ? bcryptEncoder.encode(user.getPassword()) : currentUser.getPassword());
+        if (user.getRoles() != null) {
+            Set<Role> roles = getRolesFromNames(user.getRoles().stream()
+                    .map(Role::getRoleName)
+                    .collect(Collectors.toSet()));
+
+            currentUser.getRoles().clear();
+            currentUser.getRoles().addAll(roles);
+        }
     }
 }
