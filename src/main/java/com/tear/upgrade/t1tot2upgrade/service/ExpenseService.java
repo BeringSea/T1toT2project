@@ -1,6 +1,6 @@
 package com.tear.upgrade.t1tot2upgrade.service;
 
-import com.tear.upgrade.t1tot2upgrade.entity.Expense;
+import com.tear.upgrade.t1tot2upgrade.dto.ExpenseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,17 +9,19 @@ import java.util.List;
 
 public interface ExpenseService {
 
-    Page<Expense> getAllExpenses(Pageable page);
+    Page<ExpenseDTO> getAllExpenses(Pageable page);
 
-    Expense getExpenseById(Long id);
+    ExpenseDTO getExpenseById(Long id);
 
     void deleteExpenseById(Long id);
 
-    Expense saveExpanseDetails(Expense expense);
+    void deleteAllExpensesForUser(Pageable pageable);
 
-    Expense updateExpenseDetails(Long id, Expense expense);
+    ExpenseDTO saveExpanseDetails(ExpenseDTO expense);
 
-    List<Expense> readByName(String name, Pageable page);
+    ExpenseDTO updateExpenseDetails(Long id, ExpenseDTO expenseDTO);
 
-    List<Expense> readByDate(Date startDate, Date endDate, Pageable page);
+    List<ExpenseDTO> readByName(String name, Pageable page);
+
+    List<ExpenseDTO> readByDate(Date startDate, Date endDate, Pageable page);
 }

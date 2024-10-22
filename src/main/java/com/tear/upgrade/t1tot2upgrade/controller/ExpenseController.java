@@ -1,6 +1,6 @@
 package com.tear.upgrade.t1tot2upgrade.controller;
 
-import com.tear.upgrade.t1tot2upgrade.entity.Expense;
+import com.tear.upgrade.t1tot2upgrade.dto.ExpenseDTO;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +19,38 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @GetMapping("/expenses")
-    public List<Expense> getAllExpenses(Pageable page) {
+    public List<ExpenseDTO> getAllExpenses(Pageable page) {
         return expenseService.getAllExpenses(page).toList();
     }
 
     @GetMapping("/expenses/{id}")
-    public Expense getExpenseById(@PathVariable Long id) {
+    public ExpenseDTO getExpenseById(@PathVariable Long id) {
         return expenseService.getExpenseById(id);
     }
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @DeleteMapping("/expenses")
-    public ResponseEntity<HttpStatus> deleteExpenseById(@RequestParam Long id) {
+    @DeleteMapping("/expenses/{id}")
+    public ResponseEntity<HttpStatus> deleteExpenseById(@PathVariable Long id) {
         expenseService.deleteExpenseById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @DeleteMapping("/expenses")
+    public ResponseEntity<HttpStatus> deleteExpenseById(Pageable pageable) {
+        expenseService.deleteAllExpensesForUser(pageable);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping("/expenses")
-    public Expense saveExpenseDetails(@Valid @RequestBody Expense expense) {
-        return expenseService.saveExpanseDetails(expense);
+    public ExpenseDTO saveExpenseDetails(@Valid @RequestBody ExpenseDTO expenseDTO) {
+        return expenseService.saveExpanseDetails(expenseDTO);
     }
 
     @PutMapping("/expenses/{id}")
-    public Expense updateExpenseDetails(@PathVariable Long id, @RequestBody Expense expense) {
-        return expenseService.updateExpenseDetails(id, expense);
+    public ExpenseDTO updateExpenseDetails(@PathVariable Long id, @RequestBody ExpenseDTO expenseDTO) {
+        return expenseService.updateExpenseDetails(id, expenseDTO);
     }
 
 //    @GetMapping("/expenses/category")
@@ -52,12 +59,12 @@ public class ExpenseController {
 //    }
 
     @GetMapping("/expenses/name")
-    public List<Expense> getAllExpensesByName(@RequestParam String keyword, Pageable page) {
+    public List<ExpenseDTO> getAllExpensesByName(@RequestParam String keyword, Pageable page) {
         return expenseService.readByName(keyword, page);
     }
 
     @GetMapping("/expenses/date")
-    public List<Expense> getAllExpensesByDate(@RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate, Pageable page) {
+    public List<ExpenseDTO> getAllExpensesByDate(@RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate, Pageable page) {
         return expenseService.readByDate(startDate, endDate, page);
     }
 }
