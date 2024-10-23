@@ -62,7 +62,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 expenseRepository.deleteAll(expensesPage.getContent());
             }
             pageable = pageable.next();
-        } while (expensesPage.hasNext()); // Continue until there are no more pages
+        } while (expensesPage.hasNext());
 
         if (expensesPage.getTotalElements() == 0) {
             throw new ResourceNotFoundException("No expenses found for user " + loggedInUser.getId());

@@ -37,7 +37,7 @@ public class ExpenseController {
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/expenses")
-    public ResponseEntity<HttpStatus> deleteExpenseById(Pageable pageable) {
+    public ResponseEntity<HttpStatus> deleteAllExpensesForUser(Pageable pageable) {
         expenseService.deleteAllExpensesForUser(pageable);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

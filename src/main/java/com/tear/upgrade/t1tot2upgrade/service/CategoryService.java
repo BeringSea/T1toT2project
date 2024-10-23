@@ -9,4 +9,8 @@ public interface CategoryService {
     Page<CategoryDTO> getAllExpenses(Pageable page);
 
     CategoryDTO saveCategory(CategoryDTO categoryDTO);
+
+    void deleteCategoryById(Long id);
+
+    void deleteAllCategoriesForUser(Pageable pageable);
 }
