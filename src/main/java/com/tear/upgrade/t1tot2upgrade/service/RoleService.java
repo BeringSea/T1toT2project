@@ -1,16 +1,16 @@
 package com.tear.upgrade.t1tot2upgrade.service;
 
-import com.tear.upgrade.t1tot2upgrade.entity.Role;
+import com.tear.upgrade.t1tot2upgrade.dto.RoleDTO;
 
 import java.util.List;
 
 public interface RoleService {
 
-    Role createRole(Role role);
+    RoleDTO createRole(RoleDTO role);
 
-    Role readRole(Long id);
+    RoleDTO readRole(Long id);
 
-    Role updateRole(Long roleId, Role role);
+    RoleDTO updateRole(Long roleId, RoleDTO role);
 
-    List<Role> readAllRoles();
+    List<RoleDTO> readAllRoles();
 }

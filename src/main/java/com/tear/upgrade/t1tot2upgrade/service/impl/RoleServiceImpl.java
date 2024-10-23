@@ -1,5 +1,6 @@
 package com.tear.upgrade.t1tot2upgrade.service.impl;
 
+import com.tear.upgrade.t1tot2upgrade.dto.RoleDTO;
 import com.tear.upgrade.t1tot2upgrade.entity.Role;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ItemAlreadyExistsException;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -17,27 +19,43 @@ public class RoleServiceImpl implements RoleService {
     private RoleRepository roleRepository;
 
     @Override
-    public Role createRole(Role role) {
-        if (roleRepository.existsByRoleName(role.getRoleName())) {
-            throw new ItemAlreadyExistsException("Role with " + role.getRoleName() + " already exists");
+    public RoleDTO createRole(RoleDTO roleDTO) {
+        if (roleRepository.existsByRoleName(roleDTO.getRoleName())) {
+            throw new ItemAlreadyExistsException("Role with " + roleDTO.getRoleName() + " already exists");
         }
-        return roleRepository.save(role);
+        Role role = new Role();
+        role.setRoleName(roleDTO.getRoleName());
+        Role savedRole = roleRepository.save(role);
+        return convertToDTO(savedRole);
     }
 
     @Override
-    public Role readRole(Long roleId) {
-        return roleRepository.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found for id: " + roleId));
+    public RoleDTO readRole(Long roleId) {
+        Role roleById = roleRepository.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role not found for id: " + roleId));
+        return convertToDTO(roleById);
     }
 
     @Override
-    public Role updateRole(Long roleId, Role role) {
-        Role currentRole = readRole(roleId);
-        currentRole.setRoleName(role.getRoleName() != null ? role.getRoleName() : currentRole.getRoleName());
-        return roleRepository.save(currentRole);
+    public RoleDTO updateRole(Long roleId, RoleDTO roleDTO) {
+        RoleDTO currentRole = readRole(roleId);
+        Role role = new Role();
+        role.setId(currentRole.getId());
+        role.setRoleName(roleDTO.getRoleName() != null ? roleDTO.getRoleName() : currentRole.getRoleName());
+        return convertToDTO(roleRepository.save(role));
     }
 
     @Override
-    public List<Role> readAllRoles() {
-        return roleRepository.findAll();
+    public List<RoleDTO> readAllRoles() {
+        List<Role> roles = roleRepository.findAll();
+        return roles.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private RoleDTO convertToDTO(Role role) {
+        return new RoleDTO(
+                role.getId(),
+                role.getRoleName()
+        );
     }
 }

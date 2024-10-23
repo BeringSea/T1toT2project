@@ -2,7 +2,7 @@ package com.tear.upgrade.t1tot2upgrade.service.impl;
 
 import com.tear.upgrade.t1tot2upgrade.entity.Role;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
-import com.tear.upgrade.t1tot2upgrade.entity.model.UserModel;
+import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ItemAlreadyExistsException;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import com.tear.upgrade.t1tot2upgrade.repository.RoleRepository;
@@ -35,15 +35,15 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User createUser(UserModel userModel) {
-        if (userRepository.existsByEmail(userModel.getEmail())) {
-            throw new ItemAlreadyExistsException("User is already registered with email " + userModel.getEmail());
+    public User createUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new ItemAlreadyExistsException("User is already registered with email " + userDTO.getEmail());
         }
         User user = new User();
-        BeanUtils.copyProperties(userModel, user, "roleNames");
+        BeanUtils.copyProperties(userDTO, user, "roleNames");
         user.setPassword(bcryptEncoder.encode(user.getPassword()));
 
-        Set<Role> roles = getRolesFromNames(userModel.getRoleNames());
+        Set<Role> roles = getRolesFromNames(userDTO.getRoleNames());
         user.setRoles(roles);
         roles.forEach(role -> role.getUsers().add(user));
 

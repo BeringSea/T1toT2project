@@ -1,6 +1,6 @@
 package com.tear.upgrade.t1tot2upgrade.controller;
 
-import com.tear.upgrade.t1tot2upgrade.entity.Role;
+import com.tear.upgrade.t1tot2upgrade.dto.RoleDTO;
 import com.tear.upgrade.t1tot2upgrade.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,22 +17,22 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/roles")
-    private ResponseEntity<Role> createRole(@Valid @RequestBody Role role) {
-        return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
+    private ResponseEntity<RoleDTO> createRole(@Valid @RequestBody RoleDTO roleDTO) {
+        return new ResponseEntity<>(roleService.createRole(roleDTO), HttpStatus.CREATED);
     }
 
     @GetMapping("/roles")
-    private List<Role> getAllRoles(){
+    private List<RoleDTO> getAllRoles() {
         return roleService.readAllRoles();
     }
 
     @GetMapping("roles/{id}")
-    private ResponseEntity<Role> readRole(@PathVariable Long id) {
+    private ResponseEntity<RoleDTO> readRole(@PathVariable Long id) {
         return new ResponseEntity<>(roleService.readRole(id), HttpStatus.OK);
     }
 
     @PutMapping("/roles/{id}")
-    public ResponseEntity<Role> updateRole(@PathVariable Long id, @RequestBody Role role) {
-        return new ResponseEntity<>(roleService.updateRole(id, role), HttpStatus.OK);
+    public ResponseEntity<RoleDTO> updateRole(@PathVariable Long id, @RequestBody RoleDTO roleDTO) {
+        return new ResponseEntity<>(roleService.updateRole(id, roleDTO), HttpStatus.OK);
     }
 }

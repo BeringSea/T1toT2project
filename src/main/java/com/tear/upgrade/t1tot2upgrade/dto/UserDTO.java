@@ -1,4 +1,4 @@
-package com.tear.upgrade.t1tot2upgrade.entity.model;
+package com.tear.upgrade.t1tot2upgrade.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class UserModel {
+public class UserDTO {
 
     @NotBlank(message = "Name should not be empty")
     private String username;

@@ -3,7 +3,7 @@ package com.tear.upgrade.t1tot2upgrade.controller;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
 import com.tear.upgrade.t1tot2upgrade.entity.model.AuthModel;
 import com.tear.upgrade.t1tot2upgrade.entity.model.JwtResponseModel;
-import com.tear.upgrade.t1tot2upgrade.entity.model.UserModel;
+import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
 import com.tear.upgrade.t1tot2upgrade.security.CustomUserDetailService;
 import com.tear.upgrade.t1tot2upgrade.service.JwtToken;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
@@ -45,8 +45,8 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<User> save(@Valid @RequestBody UserModel userModel) {
-        return new ResponseEntity<>(userService.createUser(userModel), HttpStatus.CREATED);
+    public ResponseEntity<User> save(@Valid @RequestBody UserDTO userDTO) {
+        return new ResponseEntity<>(userService.createUser(userDTO), HttpStatus.CREATED);
     }
 
     private void authenticate(String email, String password) throws Exception {

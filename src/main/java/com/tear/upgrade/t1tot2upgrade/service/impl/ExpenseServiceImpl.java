@@ -113,7 +113,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public List<ExpenseDTO> readByDate(Date startDate, Date endDate, Pageable page) {
         if (startDate == null) {
-            startDate = new Date(0); // January 1, 1970
+            startDate = new Date(0);
         }
         if (endDate == null) {
             endDate = new Date(System.currentTimeMillis());
