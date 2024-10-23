@@ -33,13 +33,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO saveCategory(CategoryDTO categoryDTO) {
         if (categoryDTO == null) {
-            throw new IllegalArgumentException("ExpenseDTO cannot be null");
+            throw new IllegalArgumentException("CategoryDTO cannot be null");
         }
+
         User loggedInUser = userService.getLoggedInUser();
-        Optional<Category> categoryOptional = categoryRepository.existsByNameAndUserId(categoryDTO.getName(), loggedInUser.getId());
-        if (categoryOptional.isPresent()){
+
+        boolean exists = categoryRepository.existsByNameAndUserId(categoryDTO.getName(), loggedInUser.getId());
+        if (exists) {
             throw new ItemAlreadyExistsException("Category with name: " + categoryDTO.getName() + " already exists");
         }
+
         Category category = new Category();
         category.setName(categoryDTO.getName());
         category.setDescription(categoryDTO.getDescription());
@@ -47,6 +50,17 @@ public class CategoryServiceImpl implements CategoryService {
 
         return convertToDTO(categoryRepository.save(category));
     }
+
+
+    @Override
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
+        Category existingCategory = getCategoryEntityById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category is not found for id " + id));
+        existingCategory.setName(categoryDTO.getName() != null ? categoryDTO.getName() : existingCategory.getName());
+        existingCategory.setDescription(categoryDTO.getDescription() != null ? categoryDTO.getDescription() : existingCategory.getDescription());
+        return convertToDTO(categoryRepository.save(existingCategory));
+    }
+
 
     @Override
     public void deleteCategoryById(Long id) {
@@ -74,6 +88,10 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoriesPage.getTotalElements() == 0) {
             throw new ResourceNotFoundException("No expenses found for user " + loggedInUser.getId());
         }
+    }
+
+    private Optional<Category> getCategoryEntityById(Long id) {
+        return categoryRepository.findByUserIdAndId(userService.getLoggedInUser().getId(), id);
     }
 
     private CategoryDTO convertToDTO(Category category) {

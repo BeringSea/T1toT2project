@@ -23,6 +23,16 @@ public interface CategoryService {
     CategoryDTO saveCategory(CategoryDTO categoryDTO);
 
     /**
+     * Updates the details of an existing category for any user.
+     *
+     * @param id the identifier of the category to update
+     * @param categoryDTO the updated category data
+     * @return the updated {@link CategoryDTO} instance
+     */
+    CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO);
+
+
+    /**
      * Deletes a category by its identifier.
      *
      * @param id the identifier of the category to delete

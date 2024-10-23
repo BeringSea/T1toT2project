@@ -81,9 +81,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setNotes(expenseDTO.getNotes());
         expense.setUser(loggedInUser);
 
-        Expense savedExpense = expenseRepository.save(expense);
-
-        return convertToDTO(savedExpense);
+        return convertToDTO(expenseRepository.save(expense));
     }
 
     @Override
@@ -98,9 +96,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         existingExpense.setDate(expenseDTO.getDate() != null ? expenseDTO.getDate() : existingExpense.getDate());
         existingExpense.setNotes(expenseDTO.getNotes() != null ? expenseDTO.getNotes() : existingExpense.getNotes());
 
-        Expense updatedExpense = expenseRepository.save(existingExpense);
-
-        return convertToDTO(updatedExpense);
+        return convertToDTO(expenseRepository.save(existingExpense));
     }
 
     public List<ExpenseDTO> readByName(String name, Pageable page) {

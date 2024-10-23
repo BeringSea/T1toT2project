@@ -35,6 +35,11 @@ public class CategoryController {
         return categoryService.saveCategory(categoryDTO);
     }
 
+    @PutMapping("/categories/{id}")
+    public CategoryDTO updateExpenseDetails(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
+        return categoryService.updateCategory(id, categoryDTO);
+    }
+
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @DeleteMapping("/categories")
     public ResponseEntity<HttpStatus> deleteAllCategoriesForUser(Pageable pageable) {
