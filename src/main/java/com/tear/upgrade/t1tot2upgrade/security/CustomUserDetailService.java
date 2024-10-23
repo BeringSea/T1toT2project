@@ -15,12 +15,31 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Custom implementation of the {@link UserDetailsService} interface for loading user-specific data.
+ * This service retrieves user details from the database and converts them into a format
+ * suitable for Spring Security.
+ *
+ * <p>This service is responsible for:</p>
+ * <ul>
+ *     <li>Loading a user by their email address</li>
+ *     <li>Converting the user entity to a {@link UserDTO}</li>
+ *     <li>Mapping roles to {@link GrantedAuthority} objects</li>
+ * </ul>
+ */
 @Service
 public class CustomUserDetailService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Loads a user by their email address.
+     *
+     * @param email the email address of the user
+     * @return a {@link UserDetails} object containing user information and authorities
+     * @throws UsernameNotFoundException if the user with the specified email is not found
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User existingUser = userRepository
