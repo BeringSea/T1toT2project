@@ -3,6 +3,7 @@ package com.tear.upgrade.t1tot2upgrade.service.impl;
 import com.tear.upgrade.t1tot2upgrade.dto.CategoryDTO;
 import com.tear.upgrade.t1tot2upgrade.entity.Category;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
+import com.tear.upgrade.t1tot2upgrade.exceptions.ItemAlreadyExistsException;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import com.tear.upgrade.t1tot2upgrade.repository.CategoryRepository;
 import com.tear.upgrade.t1tot2upgrade.service.CategoryService;
@@ -35,14 +36,16 @@ public class CategoryServiceImpl implements CategoryService {
             throw new IllegalArgumentException("ExpenseDTO cannot be null");
         }
         User loggedInUser = userService.getLoggedInUser();
+        Optional<Category> categoryOptional = categoryRepository.existsByNameAndUserId(categoryDTO.getName(), loggedInUser.getId());
+        if (categoryOptional.isPresent()){
+            throw new ItemAlreadyExistsException("Category with name: " + categoryDTO.getName() + " already exists");
+        }
         Category category = new Category();
         category.setName(categoryDTO.getName());
         category.setDescription(categoryDTO.getDescription());
         category.setUser(loggedInUser);
 
-        Category savedCategory = categoryRepository.save(category);
-
-        return convertToDTO(savedCategory);
+        return convertToDTO(categoryRepository.save(category));
     }
 
     @Override
