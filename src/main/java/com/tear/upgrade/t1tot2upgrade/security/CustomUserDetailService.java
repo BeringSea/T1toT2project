@@ -1,5 +1,7 @@
 package com.tear.upgrade.t1tot2upgrade.security;
 
+import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
+import com.tear.upgrade.t1tot2upgrade.entity.Role;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
 import com.tear.upgrade.t1tot2upgrade.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +23,27 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
         User existingUser = userRepository
-                .findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found for email:" + email));
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
 
-        List<GrantedAuthority> authorities = existingUser.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
+        UserDTO userDTO = convertToDTO(existingUser);
+
+        List<GrantedAuthority> authorities = userDTO.getRoleNames().stream()
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(existingUser.getEmail(), existingUser.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(userDTO.getEmail(), userDTO.getPassword(), authorities);
+    }
+
+    private UserDTO convertToDTO(User user) {
+        return new UserDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getRoles().stream()
+                        .map(Role::getRoleName)
+                        .collect(Collectors.toSet())
+        );
     }
 }
