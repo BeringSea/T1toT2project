@@ -53,10 +53,15 @@ public class ExpenseController {
         return expenseService.updateExpenseDetails(id, expenseDTO);
     }
 
-//    @GetMapping("/expenses/category")
-//    public List<Expense> getExpensesByCategory(@RequestParam String category, Pageable page) {
-//        return expenseService.readByCategory(category, page);
-//    }
+    @GetMapping("/expenses/category/{categoryName}")
+    public List<ExpenseDTO> getExpensesByCategory(@PathVariable String categoryName) {
+        return expenseService.getExpensesByCategoryName(categoryName);
+    }
+
+    @GetMapping("/expenses/user/category/{categoryName}")
+    public List<ExpenseDTO> getCategoriesByNameForLoggedInUser(@PathVariable String categoryName){
+        return expenseService.getCategoriesByNameForLoggedInUser(categoryName);
+    }
 
     @GetMapping("/expenses/name")
     public List<ExpenseDTO> getAllExpensesByName(@RequestParam String keyword, Pageable page) {

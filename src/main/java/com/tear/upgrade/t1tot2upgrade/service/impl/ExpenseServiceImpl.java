@@ -154,6 +154,29 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ExpenseDTO> getExpensesByCategoryName(String categoryName) {
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: " + categoryName));
+        List<Expense> expenses = expenseRepository.findByCategory(category);
+        return expenses.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ExpenseDTO> getCategoriesByNameForLoggedInUser(String categoryName) {
+        User loggedInUser = userService.getLoggedInUser();
+
+        Category category = categoryRepository.findByNameAndUser(categoryName, loggedInUser)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: " + categoryName));
+
+        List<Expense> expenses = expenseRepository.findByUserAndCategory(loggedInUser, category);
+        return expenses.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
     private Optional<Expense> getExpenseEntityById(Long id) {
         return expenseRepository.findByUserIdAndId(userService.getLoggedInUser().getId(), id);
     }

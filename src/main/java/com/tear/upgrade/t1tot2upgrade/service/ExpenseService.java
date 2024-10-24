@@ -74,4 +74,20 @@ public interface ExpenseService {
      * @return a list of {@link ExpenseDTO} within the specified date range
      */
     List<ExpenseDTO> readByDate(Date startDate, Date endDate, Pageable page);
+
+    /**
+     * Retrieves a list of expenses for specific category.
+     *
+     * @param categoryName the start category name
+     * @return a list of {@link ExpenseDTO} within the specified date range
+     */
+    List<ExpenseDTO> getExpensesByCategoryName (String categoryName);
+
+    /**
+     * Retrieves a list of expenses for logged-in user for specific category.
+     *
+     * @param categoryName the start category name
+     * @return a list of {@link ExpenseDTO} within the specified date range
+     */
+    List<ExpenseDTO> getCategoriesByNameForLoggedInUser(String categoryName);
 }
