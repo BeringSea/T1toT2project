@@ -1,0 +1,17 @@
+# Java build files
+target/
+*.class
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Log files
+*.log
+
+# OS specific files
+Thumbs.db
+.DS_Store
