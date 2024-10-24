@@ -48,6 +48,11 @@ public class Expense {
     @JsonIgnore
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    private Category category;
+
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private Timestamp createdAt;

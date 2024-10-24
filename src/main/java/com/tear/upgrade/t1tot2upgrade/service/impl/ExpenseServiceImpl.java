@@ -1,9 +1,12 @@
 package com.tear.upgrade.t1tot2upgrade.service.impl;
 
+import com.tear.upgrade.t1tot2upgrade.dto.CategoryDTO;
 import com.tear.upgrade.t1tot2upgrade.dto.ExpenseDTO;
+import com.tear.upgrade.t1tot2upgrade.entity.Category;
 import com.tear.upgrade.t1tot2upgrade.entity.Expense;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
+import com.tear.upgrade.t1tot2upgrade.repository.CategoryRepository;
 import com.tear.upgrade.t1tot2upgrade.repository.ExpenseRepository;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
@@ -22,6 +25,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Autowired
     private ExpenseRepository expenseRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private UserService userService;
@@ -73,6 +79,23 @@ public class ExpenseServiceImpl implements ExpenseService {
     public ExpenseDTO saveExpanseDetails(ExpenseDTO expenseDTO) {
         User loggedInUser = userService.getLoggedInUser();
 
+        Category category = null;
+        if (expenseDTO.getCategoryDTO() != null && expenseDTO.getCategoryDTO().getName() != null) {
+            Optional<Category> optionalCategory = categoryRepository.findByNameAndUser(expenseDTO.getCategoryDTO().getName(), loggedInUser);
+
+            if (optionalCategory.isPresent()) {
+                category = optionalCategory.get();
+            } else {
+                category = new Category();
+                category.setName(expenseDTO.getCategoryDTO().getName());
+                category.setDescription(expenseDTO.getCategoryDTO().getDescription());
+                category.setUser(loggedInUser);
+                category = categoryRepository.save(category);
+            }
+        } else {
+            throw new IllegalArgumentException("Category name must be provided to add an expense.");
+        }
+
         Expense expense = new Expense();
         expense.setName(expenseDTO.getName());
         expense.setDescription(expenseDTO.getDescription());
@@ -80,6 +103,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setDate(expenseDTO.getDate());
         expense.setNotes(expenseDTO.getNotes());
         expense.setUser(loggedInUser);
+        expense.setCategory(category);
 
         return convertToDTO(expenseRepository.save(expense));
     }
@@ -90,11 +114,18 @@ public class ExpenseServiceImpl implements ExpenseService {
         Expense existingExpense = getExpenseEntityById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Expense is not found for id " + id));
 
-        existingExpense.setName(expenseDTO.getName() != null ? expenseDTO.getName() : existingExpense.getName());
-        existingExpense.setDescription(expenseDTO.getDescription() != null ? expenseDTO.getDescription() : existingExpense.getDescription());
-        existingExpense.setAmount(expenseDTO.getAmount() != null ? expenseDTO.getAmount() : existingExpense.getAmount());
-        existingExpense.setDate(expenseDTO.getDate() != null ? expenseDTO.getDate() : existingExpense.getDate());
-        existingExpense.setNotes(expenseDTO.getNotes() != null ? expenseDTO.getNotes() : existingExpense.getNotes());
+        if (expenseDTO.getCategoryDTO() != null && expenseDTO.getCategoryDTO().getName() != null) {
+            User loggedInUser = userService.getLoggedInUser();
+
+            Optional<Category> optionalCategory = categoryRepository.findByNameAndUser(expenseDTO.getCategoryDTO().getName(), loggedInUser);
+
+            Category category = optionalCategory.orElseThrow(() ->
+                    new ResourceNotFoundException("Category not found for name: " + expenseDTO.getCategoryDTO().getName()));
+
+            category.setDescription(expenseDTO.getCategoryDTO().getDescription() != null ? expenseDTO.getCategoryDTO().getDescription() : category.getDescription());
+            categoryRepository.save(category);
+            existingExpense.setCategory(category);
+        }
 
         return convertToDTO(expenseRepository.save(existingExpense));
     }
@@ -128,13 +159,24 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private ExpenseDTO convertToDTO(Expense expense) {
+
+        CategoryDTO categoryDTO = null;
+        if (expense.getCategory() != null) {
+            categoryDTO = new CategoryDTO(
+                    expense.getCategory().getId(),
+                    expense.getCategory().getName(),
+                    expense.getCategory().getDescription()
+            );
+        }
+
         return new ExpenseDTO(
                 expense.getId(),
                 expense.getName(),
                 expense.getDescription(),
                 expense.getAmount(),
                 expense.getDate(),
-                expense.getNotes()
+                expense.getNotes(),
+                categoryDTO
         );
     }
 }
