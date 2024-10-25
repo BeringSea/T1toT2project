@@ -33,7 +33,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/expenses/**", "/categories/**").hasAnyRole("ADMIN","USER")
-                        .requestMatchers("/roles/**", "/user/**", "/delete/**").hasRole("ADMIN")
+                        .requestMatchers("/roles/**", "/user/**", "/delete/**", "/profiles/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

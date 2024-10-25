@@ -3,12 +3,14 @@ package com.tear.upgrade.t1tot2upgrade.dto;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProfileDTO {
 
     private Long id;
@@ -25,5 +27,5 @@ public class ProfileDTO {
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
 
-    private Long userId;
+    private String username;
 }
