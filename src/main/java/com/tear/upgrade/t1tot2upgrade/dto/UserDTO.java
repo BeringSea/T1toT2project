@@ -16,6 +16,13 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserDTO {
 
+    public UserDTO(String username, String email, Set<String> roleNames, ProfileDTO profile) {
+        this.username = username;
+        this.email = email;
+        this.roleNames = roleNames;
+        this.profile = profile;
+    }
+
     @NotBlank(message = "Name should not be empty")
     private String username;
 
@@ -29,4 +36,6 @@ public class UserDTO {
 
     @NotNull(message = "Roles should not be empty")
     private Set<String> roleNames = new HashSet<>();
+
+    private ProfileDTO profile;
 }

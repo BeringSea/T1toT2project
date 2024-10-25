@@ -15,3 +15,6 @@ target/
 # OS specific files
 Thumbs.db
 .DS_Store
+
+# env file
+.env

@@ -1,8 +1,9 @@
 package com.tear.upgrade.t1tot2upgrade.service.impl;
 
+import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
+import com.tear.upgrade.t1tot2upgrade.entity.Profile;
 import com.tear.upgrade.t1tot2upgrade.entity.Role;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
-import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ItemAlreadyExistsException;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import com.tear.upgrade.t1tot2upgrade.repository.RoleRepository;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,16 +41,30 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(userDTO.getEmail())) {
             throw new ItemAlreadyExistsException("User is already registered with email " + userDTO.getEmail());
         }
-        User user = new User();
-        BeanUtils.copyProperties(userDTO, user, "roleNames");
-        user.setPassword(bcryptEncoder.encode(user.getPassword()));
 
-        Set<Role> roles = getRolesFromNames(userDTO.getRoleNames());
+        User user = new User();
+        BeanUtils.copyProperties(userDTO, user, "roleNames", "profile");
+
+        user.setPassword(bcryptEncoder.encode(userDTO.getPassword()));
+
+        Role defaultRole = roleRepository.findByRoleName("ROLE_USER")
+                .orElseThrow(() -> new ResourceNotFoundException("Default role not found"));
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(defaultRole);
         user.setRoles(roles);
-        roles.forEach(role -> role.getUsers().add(user));
+        defaultRole.getUsers().add(user);
+
+        if (userDTO.getProfile() != null) {
+            Profile profile = new Profile();
+            BeanUtils.copyProperties(userDTO.getProfile(), profile);
+            profile.setUser(user);
+            user.setProfile(profile);
+        }
 
         return userRepository.save(user);
     }
+
 
     @Override
     public User readUser() {
@@ -104,6 +120,14 @@ public class UserServiceImpl implements UserService {
 
             currentUser.getRoles().clear();
             currentUser.getRoles().addAll(roles);
+        }
+
+        if (currentUser.getProfile() != null) {
+            Profile existingProfile = currentUser.getProfile();
+            existingProfile.setFirstName(user.getProfile().getFirstName() != null ? user.getProfile().getFirstName() : existingProfile.getFirstName());
+            existingProfile.setLastName(user.getProfile().getLastName() != null ? user.getProfile().getLastName() : existingProfile.getLastName());
+            existingProfile.setPhoneNumber(user.getProfile().getPhoneNumber() != null ? user.getProfile().getPhoneNumber() : existingProfile.getPhoneNumber());
+            existingProfile.setAddress(user.getProfile().getAddress() != null ? user.getProfile().getAddress() : existingProfile.getAddress());
         }
     }
 }
