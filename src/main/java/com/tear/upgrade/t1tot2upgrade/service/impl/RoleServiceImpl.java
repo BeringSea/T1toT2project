@@ -53,6 +53,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private RoleDTO convertToDTO(Role role) {
+        if (role == null) {
+            throw new IllegalArgumentException("Role must not be null");
+        }
+
         return RoleDTO.builder()
                 .id(role.getId())
                 .roleName(role.getRoleName())

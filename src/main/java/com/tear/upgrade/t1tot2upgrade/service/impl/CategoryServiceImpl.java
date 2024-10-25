@@ -95,6 +95,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private CategoryDTO convertToDTO(Category category) {
+        if (category == null) {
+            throw new IllegalArgumentException("Category must not be null");
+        }
         return CategoryDTO.builder()
                 .id(category.getId())
                 .name(category.getName())

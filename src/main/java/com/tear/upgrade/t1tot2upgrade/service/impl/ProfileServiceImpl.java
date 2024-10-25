@@ -27,6 +27,10 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     private ProfileDTO convertDTO(Profile profile) {
+        if (profile == null) {
+            throw new IllegalArgumentException("Profile must not be null");
+        }
+
         return ProfileDTO.builder()
                 .id(profile.getId())
                 .firstName(profile.getFirstName())

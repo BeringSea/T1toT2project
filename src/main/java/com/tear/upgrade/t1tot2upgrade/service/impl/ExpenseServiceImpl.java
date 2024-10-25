@@ -182,6 +182,10 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private ExpenseDTO convertToDTO(Expense expense) {
+        if (expense == null) {
+            throw new IllegalArgumentException("Expense must not be null");
+        }
+
         CategoryDTO categoryDTO = null;
         if (expense.getCategory() != null) {
             categoryDTO = CategoryDTO.builder()
