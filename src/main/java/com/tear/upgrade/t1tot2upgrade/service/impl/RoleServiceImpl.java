@@ -53,9 +53,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private RoleDTO convertToDTO(Role role) {
-        return new RoleDTO(
-                role.getId(),
-                role.getRoleName()
-        );
+        return RoleDTO.builder()
+                .id(role.getId())
+                .roleName(role.getRoleName())
+                .build();
     }
 }

@@ -182,24 +182,24 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private ExpenseDTO convertToDTO(Expense expense) {
-
         CategoryDTO categoryDTO = null;
         if (expense.getCategory() != null) {
-            categoryDTO = new CategoryDTO(
-                    expense.getCategory().getId(),
-                    expense.getCategory().getName(),
-                    expense.getCategory().getDescription()
-            );
+            categoryDTO = CategoryDTO.builder()
+                    .id(expense.getCategory().getId())
+                    .name(expense.getCategory().getName())
+                    .description(expense.getCategory().getDescription())
+                    .build();
         }
 
-        return new ExpenseDTO(
-                expense.getId(),
-                expense.getName(),
-                expense.getDescription(),
-                expense.getAmount(),
-                expense.getDate(),
-                expense.getNotes(),
-                categoryDTO
-        );
+        return ExpenseDTO.builder()
+                .id(expense.getId())
+                .name(expense.getName())
+                .description(expense.getDescription())
+                .amount(expense.getAmount())
+                .date(expense.getDate())
+                .notes(expense.getNotes())
+                .categoryDTO(categoryDTO)
+                .build();
     }
+
 }

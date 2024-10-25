@@ -33,7 +33,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .lastName(profile.getLastName())
                 .phoneNumber(profile.getPhoneNumber())
                 .address(profile.getAddress())
-                .username(profile.getUser().getUsername())
+                .username(profile.getUser() != null ? profile.getUser().getUsername() : null)
                 .build();
     }
 }

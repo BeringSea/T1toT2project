@@ -95,10 +95,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private CategoryDTO convertToDTO(Category category) {
-        return new CategoryDTO(
-                category.getId(),
-                category.getName(),
-                category.getDescription()
-        );
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .build();
     }
 }
