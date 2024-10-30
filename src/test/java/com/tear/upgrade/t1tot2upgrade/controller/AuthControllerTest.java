@@ -1,9 +1,12 @@
 package com.tear.upgrade.t1tot2upgrade.controller;
 
+import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
+import com.tear.upgrade.t1tot2upgrade.entity.User;
 import com.tear.upgrade.t1tot2upgrade.entity.model.AuthModel;
 import com.tear.upgrade.t1tot2upgrade.entity.model.JwtResponseModel;
 import com.tear.upgrade.t1tot2upgrade.security.CustomUserDetailService;
 import com.tear.upgrade.t1tot2upgrade.service.JwtToken;
+import com.tear.upgrade.t1tot2upgrade.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +45,9 @@ class AuthControllerTest {
     private CustomUserDetailService userDetailService;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private JwtToken jwtToken;
 
     @BeforeEach
@@ -52,7 +58,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void login_Success() throws Exception {
+    void whenEmailAndPasswordPassedUserLoggedInWithSuccess() throws Exception {
         AuthModel authModel = new AuthModel();
         authModel.setEmail("test@example.com");
         authModel.setPassword("password");
@@ -74,7 +80,7 @@ class AuthControllerTest {
 
     @ParameterizedTest
     @MethodSource("loginTestData")
-    void login_InvalidCredentials(String email, String password, Exception thrownException, String expectedMessage) {
+    void whenInvalidCredentialsThenThrowCorrespondingException(String email, String password, Exception thrownException, String expectedMessage) {
         AuthModel authModel = new AuthModel();
         authModel.setEmail(email);
         authModel.setPassword(password);
@@ -84,6 +90,37 @@ class AuthControllerTest {
         Exception exception = assertThrows(Exception.class, () -> authController.login(authModel));
 
         assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
+    void whenEmailAndPasswordPassedUserCreatedWithSuccess() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail("test@example.com");
+        userDTO.setPassword("password");
+
+        User user = new User();
+        user.setEmail(userDTO.getEmail());
+
+        when(userService.createUser(any(UserDTO.class))).thenReturn(user);
+
+        ResponseEntity<User> response = authController.save(userDTO);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(user.getEmail(), Objects.requireNonNull(response.getBody()).getEmail());
+    }
+
+
+    @Test
+    void whenEmailAlreadyExistsThenRuntimeExceptionIsThrown() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail("test@example.com");
+        userDTO.setPassword("password");
+
+        doThrow(new RuntimeException("Email already exists")).when(userService).createUser(any(UserDTO.class));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> authController.save(userDTO));
+
+        assertEquals("Email already exists", exception.getMessage());
     }
 
     static Stream<Object[]> loginTestData() {
