@@ -1,0 +1,13 @@
+{
+  "id": null,
+  "name": "",
+  "description": null,
+  "amount": null,
+  "date": null,
+  "notes": null,
+  "categoryDTO": {
+    "id": null,
+    "name": null,
+    "description": null
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "name": "Updated Expense 1",
+  "description": "Updated description for expense 1",
+  "amount": 150.00,
+  "date": "2024-10-31T00:00:00.000Z",
+  "notes": "Updated notes for expense 1",
+  "categoryDTO": {
+    "id": 1,
+    "name": "Updated Category 1",
+    "description": "Updated description for category 1"
+  }
+}

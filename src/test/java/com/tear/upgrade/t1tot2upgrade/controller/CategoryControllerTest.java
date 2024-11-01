@@ -1,10 +1,12 @@
 package com.tear.upgrade.t1tot2upgrade.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tear.upgrade.t1tot2upgrade.dto.CategoryDTO;
 import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import com.tear.upgrade.t1tot2upgrade.security.CustomUserDetailService;
 import com.tear.upgrade.t1tot2upgrade.service.CategoryService;
 import com.tear.upgrade.t1tot2upgrade.service.JwtToken;
+import com.tear.upgrade.t1tot2upgrade.utils.FileHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -18,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,19 +46,23 @@ class CategoryControllerTest {
     @MockBean
     private CustomUserDetailService customUserDetailService;
 
+    private ObjectMapper objectMapper;
+
+    private String validMessage;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
+        objectMapper = new ObjectMapper();
+        validMessage = FileHelper.readFromFile("requests/category/Category.json");
     }
 
     @Test
     @WithMockUser()
     void whenUserLoggedInThenGetAllCategoriesSuccess() throws Exception {
         // given
-        CategoryDTO categoryDTO1 = new CategoryDTO(1L, "Name 1", "Description 1");
-        CategoryDTO categoryDTO2 = new CategoryDTO(2L, "Name 2", "Description 2");
-
-        List<CategoryDTO> categories = Arrays.asList(categoryDTO1, categoryDTO2);
+        String validMessagesArray = FileHelper.readFromFile("requests/category/CategoryArray.json");
+        List<CategoryDTO> categories = Arrays.asList(objectMapper.readValue(validMessagesArray, CategoryDTO[].class));
 
         // when
         when(categoryService.getAllExpenses(any(Pageable.class))).thenReturn(new PageImpl<>(categories));
@@ -91,7 +98,7 @@ class CategoryControllerTest {
     @WithMockUser
     void whenUserLoggedInThenSaveCategorySuccess() throws Exception {
         // given
-        CategoryDTO categoryDTO = new CategoryDTO(1L, "New Category", "Category Description");
+        CategoryDTO categoryDTO = objectMapper.readValue(validMessage, CategoryDTO.class);
 
         // when
         when(categoryService.saveCategory(any(CategoryDTO.class))).thenReturn(categoryDTO);
@@ -100,9 +107,9 @@ class CategoryControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
-                        .content("{\"name\":\"New Category\", \"description\":\"Category Description\"}")
+                        .content(validMessage)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()) // Expecting a 201 Created status
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("New Category"))
                 .andExpect(jsonPath("$.description").value("Category Description"));
     }
@@ -112,7 +119,8 @@ class CategoryControllerTest {
     void whenUserLoggedInThenUpdateCategorySuccess() throws Exception {
         // given
         Long categoryId = 1L;
-        CategoryDTO updatedCategoryDTO = new CategoryDTO(categoryId, "Updated Category", "Updated Description");
+        String validMessage = FileHelper.readFromFile("requests/category/CategoryUpdated.json");
+        CategoryDTO updatedCategoryDTO = objectMapper.readValue(validMessage, CategoryDTO.class);
 
         // when
         when(categoryService.updateCategory(eq(categoryId), any(CategoryDTO.class))).thenReturn(updatedCategoryDTO);
@@ -120,7 +128,7 @@ class CategoryControllerTest {
         // then
         mockMvc.perform(MockMvcRequestBuilders.put("/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Updated Category\", \"description\":\"Updated Description\"}")
+                        .content(validMessage)
                         .accept(MediaType.APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -152,7 +160,7 @@ class CategoryControllerTest {
         // then
         mockMvc.perform(MockMvcRequestBuilders.get("/categories")
                         .with(csrf()))
-                .andExpect(status().isNotFound()) // Expecting a 404 Not Found status
+                .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("No categories found for the user")));
     }
 
@@ -177,7 +185,6 @@ class CategoryControllerTest {
     @Test
     @WithMockUser
     void whenCategoryNullThenThrowIllegalArgumentException() throws Exception {
-
         // when
         when(categoryService.saveCategory(any(CategoryDTO.class)))
                 .thenThrow(new IllegalArgumentException("CategoryDTO cannot be null"));
@@ -186,7 +193,7 @@ class CategoryControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
-                        .content("{\"name\":\"New Category\", \"description\":\"Category Description\"}")
+                        .content(validMessage)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("CategoryDTO cannot be null")));
@@ -205,8 +212,7 @@ class CategoryControllerTest {
         // then
         mockMvc.perform(MockMvcRequestBuilders.put("/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Updated Category\", \"description\":\"Updated Description\"}")
-                        .accept(MediaType.APPLICATION_JSON)
+                        .content(validMessage)
                         .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString("Invalid input")));
