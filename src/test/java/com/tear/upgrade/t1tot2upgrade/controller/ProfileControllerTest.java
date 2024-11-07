@@ -78,7 +78,7 @@ class ProfileControllerTest {
 
     @Test
     @WithMockUser()
-    void whenProfileNotFoundForLoggedInUser_thenThrowResourceNotFoundException() throws Exception {
+    void whenProfileNotFoundForLoggedInUserThenThrowResourceNotFoundException() throws Exception {
         // given
         when(profileService.getProfileForLoggedInUser())
                 .thenThrow(new ResourceNotFoundException("Profile not found for user"));
@@ -89,5 +89,4 @@ class ProfileControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("Profile not found for user")));
     }
-
 }
