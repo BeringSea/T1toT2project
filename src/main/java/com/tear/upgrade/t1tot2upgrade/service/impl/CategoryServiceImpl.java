@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public Page<CategoryDTO> getAllExpenses(Pageable page) {
+    public Page<CategoryDTO> getAllCategories(Pageable page) {
         Page<Category> categories = categoryRepository.findByUserId(userService.getLoggedInUser().getId(), page);
         return categories.map(this::convertToDTO);
     }

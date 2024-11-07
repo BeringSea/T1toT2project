@@ -12,7 +12,7 @@ public interface CategoryService {
      * @param pageable the pagination information (page number, size, sorting)
      * @return a paginated list of {@link CategoryDTO} representing all expense categories
      */
-    Page<CategoryDTO> getAllExpenses(Pageable pageable);
+    Page<CategoryDTO> getAllCategories(Pageable pageable);
 
     /**
      * Saves a new category

@@ -19,7 +19,7 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public List<CategoryDTO> getAllCategories(Pageable page) {
-        return categoryService.getAllExpenses(page).toList();
+        return categoryService.getAllCategories(page).toList();
     }
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)

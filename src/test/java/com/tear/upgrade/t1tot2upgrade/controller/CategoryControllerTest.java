@@ -65,7 +65,7 @@ class CategoryControllerTest {
         List<CategoryDTO> categories = Arrays.asList(objectMapper.readValue(validMessagesArray, CategoryDTO[].class));
 
         // when
-        when(categoryService.getAllExpenses(any(Pageable.class))).thenReturn(new PageImpl<>(categories));
+        when(categoryService.getAllCategories(any(Pageable.class))).thenReturn(new PageImpl<>(categories));
 
         // then
         mockMvc.perform(MockMvcRequestBuilders.get("/categories"))
@@ -154,7 +154,7 @@ class CategoryControllerTest {
     @WithMockUser
     void whenNoCategoriesFindForLoggedInUserThenThrowResourceNotFoundException() throws Exception {
         // when
-        when(categoryService.getAllExpenses(any(Pageable.class)))
+        when(categoryService.getAllCategories(any(Pageable.class)))
                 .thenThrow(new ResourceNotFoundException("No categories found for the user"));
 
         // then
