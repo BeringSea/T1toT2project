@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tear.upgrade.t1tot2upgrade.dto.CategoryDTO;
 import com.tear.upgrade.t1tot2upgrade.entity.Category;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
+import com.tear.upgrade.t1tot2upgrade.exceptions.ItemAlreadyExistsException;
 import com.tear.upgrade.t1tot2upgrade.repository.CategoryRepository;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
 import com.tear.upgrade.t1tot2upgrade.utils.FileHelper;
@@ -45,6 +46,8 @@ class CategoryServiceImplTest {
 
     private ObjectMapper objectMapper;
 
+    private CategoryDTO categoryDTOMock;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -52,6 +55,7 @@ class CategoryServiceImplTest {
         when(mockUser.getId()).thenReturn(1L);
         when(userService.getLoggedInUser()).thenReturn(mockUser);
         objectMapper = new ObjectMapper();
+        categoryDTOMock = mock(CategoryDTO.class);
     }
 
     @Test
@@ -62,10 +66,11 @@ class CategoryServiceImplTest {
         String validMessagesArray = FileHelper.readFromFile("requests/category/CategoryArray.json");
         List<Category> categories = Arrays.asList(objectMapper.readValue(validMessagesArray, Category[].class));
 
+        // when
         when(categoryRepository.findByUserId(anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(categories));
-
         Page<CategoryDTO> result = categoryService.getAllCategories(pageable);
 
+        // then
         assertAll("Category DTO checks",
                 () -> assertNotNull(result),
                 () -> assertEquals(2, result.getContent().size()),
@@ -84,5 +89,51 @@ class CategoryServiceImplTest {
                     assertThat(categoryDTO2.getDescription()).isEqualTo("Description 2");
                 }
         );
+    }
+
+    @Test
+    @WithMockUser
+    void whenUserLoggedInThenSaveCategorySuccess() throws IOException {
+        // given
+        String validMessage = FileHelper.readFromFile("requests/category/Category.json");
+        Category category = objectMapper.readValue(validMessage, Category.class);
+
+        // when
+        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+        CategoryDTO result = categoryService.saveCategory(categoryDTOMock);
+
+        // then
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals("New Category", result.getName()),
+                () -> assertEquals("Category Description", result.getDescription())
+        );
+    }
+
+    // TODO Just for orientation - Invalid test cases start form here
+
+    @Test
+    @WithMockUser
+    void whenCategoryDTOIsNullThenThrowIllegalArgumentException() {
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> {
+            categoryService.saveCategory(null);
+        }, "CategoryDTO cannot be null");
+    }
+
+    @Test
+    @WithMockUser
+    void whenCategoryAlreadyExistsThenThrowItemAlreadyExistsException() throws IOException {
+        // given
+        String validMessage = FileHelper.readFromFile("requests/category/Category.json");
+        CategoryDTO categoryDTO = objectMapper.readValue(validMessage, CategoryDTO.class);
+
+        // when
+        when(categoryRepository.existsByNameAndUserId(categoryDTO.getName(), 1L)).thenReturn(true);
+
+        // then
+        assertThrows(ItemAlreadyExistsException.class, () -> {
+            categoryService.saveCategory(categoryDTO);
+        }, "Category with name: New Category already exists");
     }
 }
