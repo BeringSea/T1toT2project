@@ -53,7 +53,7 @@ class RoleControllerTest {
     private String invalidMessage;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
     }
