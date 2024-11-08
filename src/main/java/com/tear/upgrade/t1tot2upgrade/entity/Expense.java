@@ -1,6 +1,7 @@
 package com.tear.upgrade.t1tot2upgrade.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -51,6 +52,7 @@ public class Expense {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JsonProperty("categoryDTO")
     private Category category;
 
     @Column(nullable = false, updatable = false)
