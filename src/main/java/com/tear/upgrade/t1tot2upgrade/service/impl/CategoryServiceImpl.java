@@ -74,6 +74,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteAllCategoriesForUser(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable must not be null");
+        }
+
         User loggedInUser = userService.getLoggedInUser();
 
         Page<Category> categoriesPage;
@@ -86,7 +90,7 @@ public class CategoryServiceImpl implements CategoryService {
         } while (categoriesPage.hasNext());
 
         if (categoriesPage.getTotalElements() == 0) {
-            throw new ResourceNotFoundException("No expenses found for user " + loggedInUser.getId());
+            throw new ResourceNotFoundException("No categories found for user " + loggedInUser.getId());
         }
     }
 
