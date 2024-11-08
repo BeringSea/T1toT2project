@@ -110,16 +110,26 @@ public class UserServiceImpl implements UserService {
     }
 
     private void populateUserFields(User user, User currentUser) {
+        if (user.getUsername() != null && user.getUsername().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
         currentUser.setUsername(user.getUsername() != null ? user.getUsername() : currentUser.getUsername());
+        if (user.getEmail() != null && !user.getEmail().matches("^[^@]+@[^@]+$")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
         currentUser.setEmail(user.getEmail() != null ? user.getEmail() : currentUser.getEmail());
-        currentUser.setPassword(user.getPassword() != null ? bcryptEncoder.encode(user.getPassword()) : currentUser.getPassword());
-        if (user.getRoles() != null) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            currentUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+        }
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             Set<Role> roles = getRolesFromNames(user.getRoles().stream()
                     .map(Role::getRoleName)
                     .collect(Collectors.toSet()));
 
             currentUser.getRoles().clear();
             currentUser.getRoles().addAll(roles);
+        } else {
+            throw new IllegalArgumentException("At least one role is required");
         }
 
         if (currentUser.getProfile() != null) {
@@ -128,6 +138,9 @@ public class UserServiceImpl implements UserService {
             existingProfile.setLastName(user.getProfile().getLastName() != null ? user.getProfile().getLastName() : existingProfile.getLastName());
             existingProfile.setPhoneNumber(user.getProfile().getPhoneNumber() != null ? user.getProfile().getPhoneNumber() : existingProfile.getPhoneNumber());
             existingProfile.setAddress(user.getProfile().getAddress() != null ? user.getProfile().getAddress() : existingProfile.getAddress());
+        }
+        else {
+            throw new IllegalArgumentException("Profile information is required");
         }
     }
 }

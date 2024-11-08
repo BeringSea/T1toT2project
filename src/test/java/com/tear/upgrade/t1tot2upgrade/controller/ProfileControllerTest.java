@@ -53,6 +53,7 @@ class ProfileControllerTest {
     @Test
     @WithMockUser()
     void whenUserLoggedInThenGetProfileSuccess() throws Exception {
+
         // given
         ObjectMapper objectMapper = new ObjectMapper();
         String validMessage = FileHelper.readFromFile("requests/profile/Profile.json");
