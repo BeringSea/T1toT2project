@@ -28,8 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ExpenseServiceImplTest {
 
@@ -127,6 +126,23 @@ class ExpenseServiceImplTest {
                 });
     }
 
+    @Test
+    void whenExpenseExistsForLoggedInUserThenDeleteExpenseSuccessfully() throws IOException {
+
+        // given
+        String validMessage = FileHelper.readFromFile("requests/expense/Expense.json");
+        Expense expense = objectMapper.readValue(validMessage, Expense.class);
+        Long expenseId = expense.getId();
+
+        // when
+        when(expenseRepository.findByUserIdAndId(1L, expenseId)).thenReturn(Optional.of(expense));
+        expenseService.deleteExpenseById(expenseId);
+
+        // then
+        verify(expenseRepository, times(1)).delete(expense);
+    }
+
+
     // TODO just break line to divide valid from invalid input values
 
     @Test
@@ -153,4 +169,21 @@ class ExpenseServiceImplTest {
         });
         assertEquals("Expense is not found for id " + invalidExpenseId, thrown.getMessage());
     }
+
+    @Test
+    void whenExpenseNotFoundForLoggedInUserThenThrowResourceNotFoundException() {
+
+        // given
+        Long invalidExpenseId = 999L;
+
+        // when
+        when(expenseRepository.findByUserIdAndId(1L, invalidExpenseId)).thenReturn(Optional.empty());
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () -> {
+            expenseService.deleteExpenseById(invalidExpenseId);
+        });
+
+        // then
+        assertEquals("Expense is not found for id " + invalidExpenseId, thrown.getMessage());
+    }
+
 }
