@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tear.upgrade.t1tot2upgrade.dto.ExpenseDTO;
 import com.tear.upgrade.t1tot2upgrade.entity.Expense;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
+import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import com.tear.upgrade.t1tot2upgrade.repository.ExpenseRepository;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
 import com.tear.upgrade.t1tot2upgrade.utils.FileHelper;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,23 +40,18 @@ class ExpenseServiceImplTest {
     private UserService userService;
 
     @Mock
-    private User loggedInUser;
-
-    @Mock
     private ExpenseRepository expenseRepository;
 
     private ObjectMapper objectMapper;
-
-    private ExpenseDTO expenseDTO;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         User mockUser = mock(User.class);
+        mockUser.setId(1L);
         when(mockUser.getId()).thenReturn(1L);
         when(userService.getLoggedInUser()).thenReturn(mockUser);
         objectMapper = new ObjectMapper();
-        expenseDTO = mock(ExpenseDTO.class);
     }
 
     @Test
@@ -102,6 +99,34 @@ class ExpenseServiceImplTest {
         );
     }
 
+    @Test
+    void whenUserLoggedInThenGetExpenseByIdSuccess() throws IOException {
+
+        // given
+        String validMessage = FileHelper.readFromFile("requests/expense/Expense.json");
+        Expense expense = objectMapper.readValue(validMessage, Expense.class);
+
+        // when
+        when(expenseRepository.findByUserIdAndId(1L, 1L)).thenReturn(Optional.of(expense));
+        ExpenseDTO result = expenseService.getExpenseById(expense.getId());
+
+        // then
+        assertAll("Expense DTO checks",
+                () -> assertNotNull(result),
+                () -> assertEquals(expense.getId(), result.getId()),
+                () -> assertEquals("Expense 1", result.getName()),
+                () -> assertEquals("Description for expense 1", result.getDescription()),
+                () -> assertEquals(new BigDecimal("100.00"), result.getAmount()),
+                () -> assertEquals(expense.getDate(), result.getDate()),
+                () -> assertEquals("Notes for expense 1", result.getNotes()),
+                () -> {
+                    assertThat(result.getCategoryDTO()).isNotNull();
+                    assertThat(result.getCategoryDTO().getId()).isEqualTo(1L);
+                    assertThat(result.getCategoryDTO().getName()).isEqualTo("Category 1");
+                    assertThat(result.getCategoryDTO().getDescription()).isEqualTo("Description for category 1");
+                });
+    }
+
     // TODO just break line to divide valid from invalid input values
 
     @Test
@@ -111,5 +136,21 @@ class ExpenseServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> {
             expenseService.getAllExpenses(null);
         }, "Pageable cannot be null");
+    }
+
+    @Test
+    void whenExpenseNotFoundForUserThenThrowResourceNotFoundException() {
+
+        // given
+        long invalidExpenseId = 999L;
+
+        // when
+        when(expenseRepository.findByUserIdAndId(1L, invalidExpenseId)).thenReturn(Optional.empty());
+
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () -> {
+            expenseService.getExpenseById(invalidExpenseId);
+        });
+        assertEquals("Expense is not found for id " + invalidExpenseId, thrown.getMessage());
     }
 }
