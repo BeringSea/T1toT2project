@@ -73,8 +73,7 @@ class ProfileControllerTest {
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
                 .andExpect(jsonPath("$.phoneNumber").value("+1234567890"))
-                .andExpect(jsonPath("$.address").value("1234 Elm Street, Springfield, IL"))
-                .andExpect(jsonPath("$.username").value("johndoe"));
+                .andExpect(jsonPath("$.address").value("1234 Elm Street, Springfield, IL"));
     }
 
     @Test

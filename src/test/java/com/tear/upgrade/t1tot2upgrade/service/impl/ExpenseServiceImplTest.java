@@ -183,13 +183,13 @@ class ExpenseServiceImplTest {
         // then
         assertAll("Expense DTO checks",
                 () -> assertNotNull(result),
-                () -> assertEquals(expense.getId(), result.getId()),
+                () -> assertEquals(expenseDTO.getId(), result.getId()),
                 () -> assertEquals(expenseDTO.getName(), result.getName()),
                 () -> assertEquals(expenseDTO.getDescription(), result.getDescription()),
                 () -> assertEquals(expenseDTO.getAmount(), result.getAmount()),
                 () -> assertEquals(expenseDTO.getDate(), result.getDate()),
                 () -> assertEquals(expenseDTO.getNotes(), result.getNotes()),
-                () -> assertEquals(expense.getId(), result.getCategoryDTO().getId()),
+                () -> assertEquals(expenseDTO.getId(), result.getCategoryDTO().getId()),
                 () -> assertEquals(expense.getCategory().getName(), result.getCategoryDTO().getName())
         );
     }
@@ -217,13 +217,13 @@ class ExpenseServiceImplTest {
         // then
         assertAll("Expense DTO checks",
                 () -> assertNotNull(result),
-                () -> assertEquals(expense.getId(), result.getId()),
+                () -> assertEquals(expenseDTO.getId(), result.getId()),
                 () -> assertEquals(expenseDTO.getName(), result.getName()),
                 () -> assertEquals(expenseDTO.getDescription(), result.getDescription()),
                 () -> assertEquals(expenseDTO.getAmount(), result.getAmount()),
                 () -> assertEquals(expenseDTO.getDate(), result.getDate()),
                 () -> assertEquals(expenseDTO.getNotes(), result.getNotes()),
-                () -> assertEquals(category.getId(), result.getCategoryDTO().getId()),
+                () -> assertEquals(expenseDTO.getId(), result.getCategoryDTO().getId()),
                 () -> assertEquals(category.getName(), result.getCategoryDTO().getName())
         );
     }
@@ -342,9 +342,6 @@ class ExpenseServiceImplTest {
         );
     }
 
-
-    // TODO just break line to divide valid from invalid input values
-
     @Test
     void whenPageableNullThenThrowIllegalArgumentException() {
 
@@ -452,7 +449,7 @@ class ExpenseServiceImplTest {
 
         // then
         ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () -> {
-            expenseService.updateExpenseDetails(existingExpense.getId(), expenseDTO);  // Should throw ResourceNotFoundException
+            expenseService.updateExpenseDetails(existingExpense.getId(), expenseDTO);
         });
         assertEquals("Category not found for name: " + expenseDTO.getCategoryDTO().getName(), thrown.getMessage());
     }
@@ -467,7 +464,7 @@ class ExpenseServiceImplTest {
 
         // when
         when(expenseRepository.findByUserIdAndNameContaining(ID_VALUE, invalidName, pageable))
-                .thenReturn(emptyPage);  // No expenses match the invalid name
+                .thenReturn(emptyPage);
         List<ExpenseDTO> result = expenseService.readByName(invalidName, pageable);
 
         // then
@@ -528,5 +525,4 @@ class ExpenseServiceImplTest {
             expenseService.getCategoriesByNameForLoggedInUser(invalidCategoryName);
         });
     }
-
 }

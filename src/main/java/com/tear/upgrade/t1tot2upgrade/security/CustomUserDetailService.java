@@ -66,7 +66,6 @@ public class CustomUserDetailService implements UserDetailsService {
             profileDTO.setLastName(user.getProfile().getLastName());
             profileDTO.setPhoneNumber(user.getProfile().getPhoneNumber());
             profileDTO.setAddress(user.getProfile().getAddress());
-            profileDTO.setUsername(user.getUsername());
         }
 
         return new UserDTO(

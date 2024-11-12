@@ -3,6 +3,5 @@
   "firstName": "John",
   "lastName": "Doe",
   "phoneNumber": "+1234567890",
-  "address": "1234 Elm Street, Springfield, IL",
-  "username": "johndoe"
+  "address": "1234 Elm Street, Springfield, IL"
 }
