@@ -163,8 +163,6 @@ class CategoryServiceImplTest {
         verify(categoryRepository, times(1)).findByUserId(anyLong(), any(Pageable.class));
     }
 
-    // TODO Just for orientation - Invalid test cases start form here
-
     @Test
     void whenCategoryDTOIsNullThenThrowIllegalArgumentException() {
 

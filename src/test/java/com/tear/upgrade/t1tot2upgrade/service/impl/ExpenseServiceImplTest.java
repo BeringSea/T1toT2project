@@ -71,7 +71,6 @@ class ExpenseServiceImplTest {
 
         // then
         assertAll("Expense DTO checks",
-                // Ensure result is not null and that there are exactly 2 expenses in the content
                 () -> assertNotNull(result),
                 () -> assertEquals(2, result.getContent().size()),
                 () -> {
@@ -101,5 +100,16 @@ class ExpenseServiceImplTest {
                     assertThat(expenseDTO2.getCategoryDTO().getDescription()).isEqualTo("Description for category 2");
                 }
         );
+    }
+
+    // TODO just break line to divide valid from invalid input values
+
+    @Test
+    void whenPageableNullThenThrowIllegalArgumentException() {
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> {
+            expenseService.getAllExpenses(null);
+        }, "Pageable cannot be null");
     }
 }

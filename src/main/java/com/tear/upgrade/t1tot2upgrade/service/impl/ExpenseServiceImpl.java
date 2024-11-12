@@ -34,6 +34,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Page<ExpenseDTO> getAllExpenses(Pageable page) {
+        if (page == null) {
+            throw new IllegalArgumentException("Pageable cannot be null");
+        }
         Page<Expense> expenses = expenseRepository.findByUserId(userService.getLoggedInUser().getId(), page);
         return expenses.map(this::convertToDTO);
     }
