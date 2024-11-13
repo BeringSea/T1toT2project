@@ -48,10 +48,7 @@ public class JwtToken {
 
     }
 
-    private SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+
 
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -62,6 +59,11 @@ public class JwtToken {
         final List<String> roles = extractRoles(token);
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token) &&
                 new HashSet<>(roles).containsAll(userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()));
+    }
+
+    private SecretKey getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
