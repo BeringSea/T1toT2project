@@ -1,5 +1,6 @@
 package com.tear.upgrade.t1tot2upgrade.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDTO {
 
     public UserDTO(String username, String email, Set<String> roleNames, ProfileDTO profile) {
