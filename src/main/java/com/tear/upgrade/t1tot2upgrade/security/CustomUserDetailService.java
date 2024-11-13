@@ -5,6 +5,7 @@ import com.tear.upgrade.t1tot2upgrade.dto.UserDTO;
 import com.tear.upgrade.t1tot2upgrade.entity.Role;
 import com.tear.upgrade.t1tot2upgrade.entity.User;
 import com.tear.upgrade.t1tot2upgrade.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * </ul>
  */
 @Service
+@Slf4j
 public class CustomUserDetailService implements UserDetailsService {
 
     @Autowired
@@ -43,15 +45,22 @@ public class CustomUserDetailService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        log.info("Attempting to load user with email: {}", email);
         User existingUser = userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found for email: " + email));
+                .orElseThrow(() -> {
+                    log.error("User not found for email: {}", email);
+                    return new UsernameNotFoundException("User not found for email: " + email);
+                });
+        log.info("User found with email: {}", email);
 
         UserDTO userDTO = convertToDTO(existingUser);
+        log.info("User details converted to DTO for email: {}", email);
 
         List<GrantedAuthority> authorities = userDTO.getRoleNames().stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+        log.info("Authorities assigned to user: {}", authorities);
 
         return new org.springframework.security.core.userdetails.User(userDTO.getEmail(), userDTO.getPassword(), authorities);
     }
