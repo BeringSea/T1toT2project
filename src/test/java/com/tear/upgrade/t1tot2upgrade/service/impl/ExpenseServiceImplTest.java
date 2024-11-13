@@ -183,13 +183,13 @@ class ExpenseServiceImplTest {
         // then
         assertAll("Expense DTO checks",
                 () -> assertNotNull(result),
-                () -> assertEquals(expenseDTO.getId(), result.getId()),
-                () -> assertEquals(expenseDTO.getName(), result.getName()),
-                () -> assertEquals(expenseDTO.getDescription(), result.getDescription()),
-                () -> assertEquals(expenseDTO.getAmount(), result.getAmount()),
-                () -> assertEquals(expenseDTO.getDate(), result.getDate()),
-                () -> assertEquals(expenseDTO.getNotes(), result.getNotes()),
-                () -> assertEquals(expenseDTO.getId(), result.getCategoryDTO().getId()),
+                () -> assertEquals(expense.getId(), result.getId()),
+                () -> assertEquals(expense.getName(), result.getName()),
+                () -> assertEquals(expense.getDescription(), result.getDescription()),
+                () -> assertEquals(expense.getAmount(), result.getAmount()),
+                () -> assertEquals(expense.getDate(), result.getDate()),
+                () -> assertEquals(expense.getNotes(), result.getNotes()),
+                () -> assertEquals(expense.getId(), result.getCategoryDTO().getId()),
                 () -> assertEquals(expense.getCategory().getName(), result.getCategoryDTO().getName())
         );
     }
@@ -217,13 +217,13 @@ class ExpenseServiceImplTest {
         // then
         assertAll("Expense DTO checks",
                 () -> assertNotNull(result),
-                () -> assertEquals(expenseDTO.getId(), result.getId()),
-                () -> assertEquals(expenseDTO.getName(), result.getName()),
-                () -> assertEquals(expenseDTO.getDescription(), result.getDescription()),
-                () -> assertEquals(expenseDTO.getAmount(), result.getAmount()),
-                () -> assertEquals(expenseDTO.getDate(), result.getDate()),
-                () -> assertEquals(expenseDTO.getNotes(), result.getNotes()),
-                () -> assertEquals(expenseDTO.getId(), result.getCategoryDTO().getId()),
+                () -> assertEquals(expense.getId(), result.getId()),
+                () -> assertEquals(expense.getName(), result.getName()),
+                () -> assertEquals(expense.getDescription(), result.getDescription()),
+                () -> assertEquals(expense.getAmount(), result.getAmount()),
+                () -> assertEquals(expense.getDate(), result.getDate()),
+                () -> assertEquals(expense.getNotes(), result.getNotes()),
+                () -> assertEquals(expense.getId(), result.getCategoryDTO().getId()),
                 () -> assertEquals(category.getName(), result.getCategoryDTO().getName())
         );
     }
@@ -237,23 +237,23 @@ class ExpenseServiceImplTest {
         Expense expense = objectMapper.readValue(validMessage, Expense.class);
         ExpenseDTO expenseDTO = objectMapper.readValue(validMessage, ExpenseDTO.class);
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Expense> expensesPage = new PageImpl<>(List.of(expense), pageable, 1);  // Page with one expense
+        Page<Expense> expensesPage = new PageImpl<>(List.of(expense), pageable, 1);
 
         // when
         when(expenseRepository.findByUserIdAndNameContaining(ID_VALUE, validName, pageable))
-                .thenReturn(expensesPage);  // Mock the repository to return a page with the expense
+                .thenReturn(expensesPage);
         List<ExpenseDTO> result = expenseService.readByName(validName, pageable);
 
         // then
         assertAll("Expense DTO checks",
                 () -> assertNotNull(result),
                 () -> assertEquals(1, result.size()),
-                () -> assertEquals(expenseDTO.getId(), result.get(0).getId()),
-                () -> assertEquals(expenseDTO.getName(), result.get(0).getName()),
-                () -> assertEquals(expenseDTO.getDescription(), result.get(0).getDescription()),
-                () -> assertEquals(expenseDTO.getAmount(), result.get(0).getAmount()),
-                () -> assertEquals(expenseDTO.getDate(), result.get(0).getDate()),
-                () -> assertEquals(expenseDTO.getNotes(), result.get(0).getNotes())
+                () -> assertEquals(expense.getId(), result.get(0).getId()),
+                () -> assertEquals(expense.getName(), result.get(0).getName()),
+                () -> assertEquals(expense.getDescription(), result.get(0).getDescription()),
+                () -> assertEquals(expense.getAmount(), result.get(0).getAmount()),
+                () -> assertEquals(expense.getDate(), result.get(0).getDate()),
+                () -> assertEquals(expense.getNotes(), result.get(0).getNotes())
         );
     }
 
