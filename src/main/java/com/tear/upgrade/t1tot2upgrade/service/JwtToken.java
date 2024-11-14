@@ -48,8 +48,6 @@ public class JwtToken {
 
     }
 
-
-
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
