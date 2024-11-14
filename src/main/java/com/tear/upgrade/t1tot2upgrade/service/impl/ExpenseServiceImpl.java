@@ -10,6 +10,7 @@ import com.tear.upgrade.t1tot2upgrade.repository.CategoryRepository;
 import com.tear.upgrade.t1tot2upgrade.repository.ExpenseRepository;
 import com.tear.upgrade.t1tot2upgrade.service.ExpenseService;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ExpenseServiceImpl implements ExpenseService {
 
     @Autowired
@@ -35,9 +37,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public Page<ExpenseDTO> getAllExpenses(Pageable page) {
         if (page == null) {
+            log.error("Pageable is null");
             throw new IllegalArgumentException("Pageable cannot be null");
         }
+        log.debug("Fetching expenses for user ID: {} with pageable: {}", userService.getLoggedInUser().getId(), page);
         Page<Expense> expenses = expenseRepository.findByUserId(userService.getLoggedInUser().getId(), page);
+        log.info("Fetched {} expenses for user ID: {}", expenses.getTotalElements(), userService.getLoggedInUser().getId());
         return expenses.map(this::convertToDTO);
     }
 
@@ -45,9 +50,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     public ExpenseDTO getExpenseById(Long id) {
         Optional<Expense> expense = getExpenseEntityById(id);
         if (expense.isPresent()) {
+            log.debug("Found expense with ID: {}", id);
             return convertToDTO(expense.get());
+        } else {
+            log.error("Expense with ID '{}' not found. Throwing ResourceNotFoundException.", id);
+            throw new ResourceNotFoundException("Expense is not found for id " + id);
         }
-        throw new ResourceNotFoundException("Expense is not found for id " + id);
     }
 
     @Override
@@ -55,7 +63,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         Optional<Expense> expenseOptional = expenseRepository.findByUserIdAndId(userService.getLoggedInUser().getId(), id);
         if (expenseOptional.isPresent()) {
             expenseRepository.delete(expenseOptional.get());
+            log.info("Expense with ID '{}' deleted successfully", id);
         } else {
+            log.error("Expense with ID '{}' not found for deletion", id);
             throw new ResourceNotFoundException("Expense is not found for id " + id);
         }
     }
@@ -68,14 +78,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         do {
             expensesPage = expenseRepository.findByUserId(loggedInUser.getId(), pageable);
             if (!expensesPage.isEmpty()) {
+                log.debug("Deleting {} expenses for user ID: {}", expensesPage.getContent().size(), loggedInUser.getId());
                 expenseRepository.deleteAll(expensesPage.getContent());
             }
             pageable = pageable.next();
         } while (expensesPage.hasNext());
 
         if (expensesPage.getTotalElements() == 0) {
+            log.error("No expenses found for user ID: {}", loggedInUser.getId());
             throw new ResourceNotFoundException("No expenses found for user " + loggedInUser.getId());
         }
+        log.info("All expenses deleted for user ID: {}", loggedInUser.getId());
     }
 
     @Override
@@ -88,14 +101,18 @@ public class ExpenseServiceImpl implements ExpenseService {
 
             if (optionalCategory.isPresent()) {
                 category = optionalCategory.get();
+                log.debug("Category '{}' found for user ID: {}", expenseDTO.getCategoryDTO().getName(), loggedInUser.getId());
             } else {
+                log.debug("Category '{}' not found. Creating new category.", expenseDTO.getCategoryDTO().getName());
                 category = new Category();
                 category.setName(expenseDTO.getCategoryDTO().getName());
                 category.setDescription(expenseDTO.getCategoryDTO().getDescription());
                 category.setUser(loggedInUser);
                 category = categoryRepository.save(category);
+                log.debug("New category '{}' created and saved", expenseDTO.getCategoryDTO().getName());
             }
         } else {
+            log.error("Category name must be provided to add an expense.");
             throw new IllegalArgumentException("Category name must be provided to add an expense.");
         }
 
@@ -115,26 +132,34 @@ public class ExpenseServiceImpl implements ExpenseService {
     public ExpenseDTO updateExpenseDetails(Long id, ExpenseDTO expenseDTO) {
 
         Expense existingExpense = getExpenseEntityById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Expense is not found for id " + id));
+                .orElseThrow(() -> {
+                    log.error("Expense with ID '{}' not found", id);
+                    return new ResourceNotFoundException("Expense is not found for id " + id);
+                });
 
         if (expenseDTO.getCategoryDTO() != null && expenseDTO.getCategoryDTO().getName() != null) {
             User loggedInUser = userService.getLoggedInUser();
-
             Optional<Category> optionalCategory = categoryRepository.findByNameAndUser(expenseDTO.getCategoryDTO().getName(), loggedInUser);
 
-            Category category = optionalCategory.orElseThrow(() ->
-                    new ResourceNotFoundException("Category not found for name: " + expenseDTO.getCategoryDTO().getName()));
+            if (optionalCategory.isEmpty()) {
+                log.error("Category with name '{}' not found for user ID: {}", expenseDTO.getCategoryDTO().getName(), loggedInUser.getId());
+                throw new ResourceNotFoundException("Category not found for name: " + expenseDTO.getCategoryDTO().getName());
+            }
 
+            Category category = optionalCategory.get();
             category.setDescription(expenseDTO.getCategoryDTO().getDescription() != null ? expenseDTO.getCategoryDTO().getDescription() : category.getDescription());
             categoryRepository.save(category);
+            log.info("Category '{}' updated successfully for expense with ID: {}", expenseDTO.getCategoryDTO().getName(), id);
             existingExpense.setCategory(category);
         }
 
         return convertToDTO(expenseRepository.save(existingExpense));
     }
 
+    @Override
     public List<ExpenseDTO> readByName(String name, Pageable page) {
         List<Expense> expenses = expenseRepository.findByUserIdAndNameContaining(userService.getLoggedInUser().getId(), name, page).toList();
+        log.debug("Found {} expenses with name containing '{}'", expenses.size(), name);
         return expenses.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -151,6 +176,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         List<Expense> expenses = expenseRepository.findByUserIdAndDateBetween(
                 userService.getLoggedInUser().getId(), startDate, endDate, page).toList();
+        log.debug("Found {} expenses between dates: {} and {}", expenses.size(), startDate, endDate);
 
         return expenses.stream()
                 .map(this::convertToDTO)
@@ -160,8 +186,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public List<ExpenseDTO> getExpensesByCategoryName(String categoryName) {
         Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: " + categoryName));
+                .orElseThrow(() -> {
+                    log.error("Category '{}' not found", categoryName);
+                    return new ResourceNotFoundException("Category not found with name: " + categoryName);
+                });
         List<Expense> expenses = expenseRepository.findByCategory(category);
+        log.info("Found {} expenses for category name: {}", expenses.size(), categoryName);
         return expenses.stream()
                 .map(this::convertToDTO)
                 .toList();
@@ -172,9 +202,13 @@ public class ExpenseServiceImpl implements ExpenseService {
         User loggedInUser = userService.getLoggedInUser();
 
         Category category = categoryRepository.findByNameAndUser(categoryName, loggedInUser)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with name: " + categoryName));
+                .orElseThrow(() -> {
+                    log.error("Category '{}' not found for user ID: {}", categoryName, loggedInUser.getId());
+                    return new ResourceNotFoundException("Category not found with name: " + categoryName);
+                });
 
         List<Expense> expenses = expenseRepository.findByUserAndCategory(loggedInUser, category);
+        log.info("Found {} expenses for user ID: {} and category '{}'", expenses.size(), loggedInUser.getId(), categoryName);
         return expenses.stream()
                 .map(this::convertToDTO)
                 .toList();
@@ -186,6 +220,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     private ExpenseDTO convertToDTO(Expense expense) {
         if (expense == null) {
+            log.error("Expense is null, cannot convert to DTO");
             throw new IllegalArgumentException("Expense must not be null");
         }
 
@@ -208,5 +243,4 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .categoryDTO(categoryDTO)
                 .build();
     }
-
 }
