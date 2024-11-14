@@ -1,6 +1,7 @@
 package com.tear.upgrade.t1tot2upgrade.configuration;
 
 import com.tear.upgrade.t1tot2upgrade.security.CustomUserDetailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class WebSecurityConfig {
 
     @Autowired
@@ -29,6 +31,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring security filter chain");
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login", "/register").permitAll()
@@ -43,26 +46,28 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtFilter jwtTokenFilter() {
+        log.info("Creating JWT Filter");
         return new JwtFilter();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.info("Creating Password Encoder (BCrypt)");
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
+        log.info("Creating DaoAuthenticationProvider");
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-
         return authProvider;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        log.info("Creating Authentication Manager");
         return authConfig.getAuthenticationManager();
     }
 }
