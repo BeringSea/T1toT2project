@@ -37,7 +37,6 @@ public class ProfileServiceImpl implements ProfileService {
             throw new IllegalArgumentException("Profile must not be null");
         }
         log.debug("Converting profile to DTO for profile ID: {}", profile.getId());
-
         return ProfileDTO.builder()
                 .id(profile.getId())
                 .firstName(profile.getFirstName())

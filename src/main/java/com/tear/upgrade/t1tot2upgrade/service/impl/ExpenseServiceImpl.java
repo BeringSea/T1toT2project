@@ -232,7 +232,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                     .description(expense.getCategory().getDescription())
                     .build();
         }
-
+        log.debug("Converting expense with ID: {} to DTO", expense.getId());
         return ExpenseDTO.builder()
                 .id(expense.getId())
                 .name(expense.getName())
