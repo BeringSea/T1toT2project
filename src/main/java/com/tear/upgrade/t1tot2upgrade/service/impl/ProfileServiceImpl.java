@@ -6,10 +6,12 @@ import com.tear.upgrade.t1tot2upgrade.exceptions.ResourceNotFoundException;
 import com.tear.upgrade.t1tot2upgrade.repository.ProfileRepository;
 import com.tear.upgrade.t1tot2upgrade.service.ProfileService;
 import com.tear.upgrade.t1tot2upgrade.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ProfileServiceImpl implements ProfileService {
 
     @Autowired
@@ -23,13 +25,18 @@ public class ProfileServiceImpl implements ProfileService {
         Long userId = userService.getLoggedInUser().getId();
         return profileRepository.findByUserId(userId)
                 .map(this::convertDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user with ID: " + userId));
+                .orElseThrow(() -> {
+                    log.error("Profile not found for user with ID: {}", userId);
+                    return new ResourceNotFoundException("Profile not found for user with ID: " + userId);
+                });
     }
 
     private ProfileDTO convertDTO(Profile profile) {
         if (profile == null) {
+            log.error("Attempted to convert null profile to DTO");
             throw new IllegalArgumentException("Profile must not be null");
         }
+        log.debug("Converting profile to DTO for profile ID: {}", profile.getId());
 
         return ProfileDTO.builder()
                 .id(profile.getId())
