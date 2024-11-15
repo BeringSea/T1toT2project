@@ -48,7 +48,7 @@ Ensure you have the following installed:
 
 - JDK 17 or higher
 - Maven (for building the project)
-- PostgreSQL or any relational database (for production) or an in-memory database (for testing)
+- MySQL relational database
 - Postman (for testing API endpoints)
 
 ### Steps to Set Up
@@ -60,10 +60,11 @@ Ensure you have the following installed:
     ```
 
 2. **Configure Database**:
-    - Set up your PostgreSQL database or configure an in-memory database like H2 in `application.properties`.
-    - Example for PostgreSQL:
+    - Set up your mysql database or configure an in-memory database like H2 in `application.properties`.
+    - Currently all properties are read from .env file
+    - Example for mysql:
       ```properties
-      spring.datasource.url=jdbc:postgresql://localhost:5432/expense_db
+      spring.datasource.url=jdbc:mysql://localhost:3306/expensetracker?useSSL=false
       spring.datasource.username=your_db_user
       spring.datasource.password=your_db_password
       ```
