@@ -73,7 +73,12 @@ Ensure you have the following installed:
     mvn clean install
     ```
 
-4. **Run the application**:
+4. **Run tests**:
+    ```bash
+    mvn clean test
+    ```
+
+5. **Run the application**:
     ```bash
     mvn spring-boot:run
     ```
